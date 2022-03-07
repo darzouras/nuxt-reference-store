@@ -1,7 +1,15 @@
 <template>
   <div v-if="activeCrossSells.length" class="mt-12">
-    <h2 v-if="content.heading" class="text-lg font-medium text-gray-900">
-      {{ content.heading }}
+    <h2 class="text-lg font-medium text-gray-900">
+      <span v-if="!cart.lineItems.length">
+        Add something to your cart
+      </span>
+      <span v-else-if="cart.lineItems.length && content.heading">
+        {{ content.heading }}
+      </span>
+      <span v-else>
+        You might also like
+      </span>
     </h2>
     <ul>
       <li v-for="item in activeCrossSells" :key="item.id" class="py-6 flex">
@@ -93,7 +101,7 @@ export default {
       });
     });
 
-    return { content, addProduct, crossSells, activeCrossSells };
+    return { cart, content, addProduct, crossSells, activeCrossSells };
   }
 };
 </script>
