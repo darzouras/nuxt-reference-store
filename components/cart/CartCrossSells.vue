@@ -61,7 +61,7 @@
 
 <script>
 import { useSpaceProvider, useCartProvider } from "@nacelle/vue";
-import { ref, inject, computed, useFetch } from "@nuxtjs/composition-api";
+import { ref, inject, computed, useFetch, useStore } from "@nuxtjs/composition-api";
 import Price from "~/components/core/Price.vue";
 
 export default {
@@ -73,12 +73,26 @@ export default {
     const { nacelleSdk } = useSpaceProvider();
     const { cart, addItem } = useCartProvider();
     const crossSells = ref([]);
+    const store = useStore();
     const content = inject("crosssells");
     const isCheckingOut = inject("isCheckingOut");
 
     const addProduct = product => {
+      // check if a preferred variant is stored
+      let productVariant
+      if (store.state.sizePreference.size) {
+        // cycle through variants to find the one that matches the size
+        product.variants.forEach(variant => {
+          if (variant.title === store.state.sizePreference.size) {
+            productVariant = variant
+          }
+        })
+      }
+      if (!productVariant) {
+        productVariant = product.variants[0];
+      }
       if (!isCheckingOut.value) {
-        addItem({ product, variant: product.variants[0], quantity: 1 });
+        addItem({ product, variant: productVariant, quantity: 1 });
       }
     };
 
