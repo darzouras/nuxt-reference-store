@@ -160,7 +160,7 @@
 
 <script>
 import { useProductProvider, useCartProvider } from "@nacelle/vue";
-import { computed, inject, ref } from "@nuxtjs/composition-api";
+import { computed, inject, ref, useStore } from "@nuxtjs/composition-api";
 import Price from "~/components/core/Price.vue";
 import ProductExpandableSection from './ProductExpandableSection.vue';
 
@@ -173,6 +173,7 @@ export default {
   setup() {
     const { product, setSelectedVariant, setSelectedOptions } = useProductProvider();
     const { addItem } = useCartProvider();
+    const store = useStore();
     const cartOpen = inject("cartOpen");
     const features = inject("features");
     const activeImageIndex = ref(product.value.media.findIndex(media => media.type === "image"));
@@ -188,6 +189,9 @@ export default {
     });
 
     const isOptionSelected = (name, value) => {
+      if (store.state.sizePreference.size) {
+        return store.state.sizePreference.size === value;
+      }
       return product.value.selectedOptions.some((option) => {
         return option.name === name && option.value === value;
       });
@@ -202,6 +206,11 @@ export default {
       if (index !== -1) options[index] = newOption;
       else options.push(newOption);
       setSelectedOptions({ options });
+
+      // if variant is for size, store the size preference
+      if (name === "Size") {
+        store.commit('sizePreference/setSize', event.target.value)
+      }
     }
 
     const handleAddItem = () => {

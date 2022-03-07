@@ -17,12 +17,13 @@
       <div v-if="product.variants.length > 1">
         <select
           class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md mt-3"
-          @change="selectVariant($event)"
+          @change="selectVariant($event, product.variants[0].selectedOptions[0].name)"
         >
           <option
             v-for="variant in product.variants"
             :key="variant.id"
             :value="variant.id"
+            :selected="isOptionSelected(variant.title)"
             >{{ variant.title }}</option
           >
         </select>
@@ -64,7 +65,7 @@
 </template>
 
 <script>
-import { ref, inject } from "@nuxtjs/composition-api";
+import { ref, inject, useStore } from "@nuxtjs/composition-api";
 import { useCartProvider } from "@nacelle/vue";
 import Price from "~/components/core/Price.vue";
 
@@ -81,12 +82,25 @@ export default {
   setup(props) {
     const { addItem } = useCartProvider();
     const setCartOpen = inject("setCartOpen");
+    const store = useStore();
     const selectedVariant = ref(props.product.variants[0]);
-    const selectVariant = event => {
+    const selectVariant = (event, variantName) => {
       selectedVariant.value = props.product.variants.find(
         variant => variant.id === event.target.value
       );
+
+      if (variantName === 'Size') {
+        store.commit('sizePreference/setSize', event.target.selectedOptions[0].innerText)
+        console.log(store.state.sizePreference.size)
+      }
     };
+
+    const isOptionSelected = (value) => {
+      if (store.state.sizePreference.size === value) {
+        return true
+      } else return false
+    }
+
     const addProduct = product => {
       setCartOpen(true);
       addItem({
@@ -104,7 +118,8 @@ export default {
       setHover,
       addProduct,
       selectVariant,
-      selectedVariant
+      selectedVariant,
+      isOptionSelected
     };
   }
 };
