@@ -59,7 +59,9 @@
               </div>
             </div>
           </div>
-          <cart-total v-if="cart.lineItems.length" />
+          <transition name="fade-in-up">
+            <cart-total v-if="cart.lineItems.length" class="transition ease-in-out duration-500" />
+          </transition>
         </div>
       </div>
     </transition>
@@ -100,5 +102,17 @@ export default {
 .slide-enter,
 .slide-leave-to {
   transform: translateX(100%);
+}
+
+.fade-in-up-enter-active,
+.fade-in-up-leave-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in-up-enter,
+.fade-in-up-leave-to {
+  opacity: 0;
+  transform: translateY(25px);
 }
 </style>
