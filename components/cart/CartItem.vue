@@ -37,7 +37,26 @@
         </p>
       </div>
       <div class="flex-1 flex items-end justify-between text-sm">
-        <p class="text-gray-500">{{ content.quantity }} {{ item.quantity }}</p>
+        <div>
+          <p class="text-gray-500">{{ content.quantity }} {{ item.quantity }}</p>
+          <p class="flex text-gray-400 items-center">
+            <button
+              @click="changeQuantity(item.id, 1)"
+              class="p-2 hover:text-gray-500"
+              aria-label="Increase item quantity"
+              >
+              +
+            </button>
+            <span>/</span>
+            <button
+              @click="changeQuantity(item.id, -1)"
+              class="p-2 hover:text-gray-500"
+              aria-label="Decrease item quantity"
+            >
+              -
+            </button>
+          </p>
+        </div>
 
         <div class="flex">
           <button
@@ -70,7 +89,7 @@ export default {
     }
   },
   setup() {
-    const { removeItem } = useCartProvider();
+    const { decrementItem, incrementItem, removeItem } = useCartProvider();
     const content = inject("item");
     const isCheckingOut = inject("isCheckingOut");
 
@@ -80,7 +99,15 @@ export default {
       }
     };
 
-    return { content, removeItemFromCart, isCheckingOut };
+    const changeQuantity = (cartItemId, change) => {
+      if (change === 1) {
+        incrementItem(cartItemId);
+      } else {
+        decrementItem(cartItemId);
+      }
+    };
+
+    return { content, changeQuantity, removeItemFromCart, isCheckingOut };
   }
 };
 </script>
